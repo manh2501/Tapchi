@@ -1,0 +1,29 @@
+QUARTILEFINDER — TỔNG LƯỢT TRUY CẬP TOÀN WEBSITE
+
+Đã tích hợp giao diện và API, nhưng muốn có số THẬT trên MỌI THIẾT BỊ cần xuất bản website cùng cơ sở dữ liệu Cloudflare D1. Không thể đếm tổng truy cập từ file HTML offline đơn lẻ.
+
+CÁCH TRIỂN KHAI CLOUDFLARE PAGES (miễn phí trong giới hạn gói):
+
+1. Đưa nguyên thư mục này lên một repository GitHub (đặc biệt phải giữ thư mục functions/api/visits.js).
+2. Đăng nhập Cloudflare Dashboard, tạo Pages project từ GitHub repository đó.
+   Framework preset: None; build command: bỏ trống; output directory: / (root).
+   Chú ý: upload mỗi index.html hoặc ZIP dạng Direct Upload có thể không triển khai Pages Functions; sử dụng Git integration là cách khuyến nghị.
+3. Trên Cloudflare Dashboard -> D1 SQL Database -> Create database, đặt tên ví dụ quartilefinder-visits.
+4. Vào database -> Console, chạy nội dung trong file schema.sql để tạo bảng và hàng khởi tạo.
+5. Vào Pages project -> Settings -> Bindings -> Add -> D1 database:
+   variable/binding name: DB (chính xác chữ hoa); chọn database vừa tạo.
+6. Redeploy project để binding có hiệu lực.
+7. Mở https://ten-du-an.pages.dev/ trên 2 thiết bị khác nhau; cuộn cuối trang, góc phải hiển thị cùng tổng lượt truy cập. Dữ liệu sẽ tăng khi mở phiên mới.
+
+CÁCH ĐẾM
+- Một lượt là một phiên tab trình duyệt mở website; reload trong cùng tab không tăng nếu sessionStorage hoạt động.
+- Khi mở tab mới, dùng trình duyệt khác hoặc phiên mới, tính một lượt.
+- Không phải số người dùng duy nhất hay chỉ số chống bot tuyệt đối.
+- Đếm từ lúc thiết lập D1; không thể khôi phục số truy cập trong quá khứ nếu chưa có analytics.
+- Khi thiếu backend, hiện dấu — và thông báo chưa cấu hình, KHÔNG hiển thị số lượt local như tổng toàn website.
+- Dữ liệu tạp chí SCImago 2025 vẫn nằm trực tiếp trong index.html và tra cứu offline được.
+
+KIỂM TRA API
+Mở https://ten-du-an.pages.dev/api/visits để xem {"total":...}.
+Nếu hiển thị 404: kiểm tra git chứa functions/api/visits.js và Pages Functions đã được deploy.
+Nếu hiển thị lỗi DB: kiểm tra binding DB, chạy schema.sql, sau đó redeploy.
